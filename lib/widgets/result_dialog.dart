@@ -9,7 +9,7 @@ void mostrarResultado(
 }) {
   showDialog(
     context: context,
-    barrierDismissible: false, // no se cierra tocando afuera
+    barrierDismissible: false, 
     builder: (BuildContext contextDialogo) {
       return ResultDialog(esPremio: esPremio, mensaje: mensaje);
     },
@@ -28,7 +28,6 @@ class ResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Verde/dorado si es premio, rojo/naranja si es castigo
     final Color colorA = esPremio ? AppColors.premioInicio : AppColors.castigoInicio;
     final Color colorB = esPremio ? AppColors.premioFin : AppColors.castigoFin;
 
@@ -83,7 +82,7 @@ class ResultDialog extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // cierra el pop-up
+                Navigator.of(context).pop(); 
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

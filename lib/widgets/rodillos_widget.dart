@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../logic/game_logic.dart';
 
 class SlotMachineReels extends StatefulWidget {
   final bool girando;
+
+  final List<String>? resultadosFinales;
+
   final Function(List<String> resultadosFinales)? onAnimationComplete;
 
   const SlotMachineReels({
     super.key,
     required this.girando,
+    this.resultadosFinales,
     this.onAnimationComplete,
   });
 
@@ -18,9 +23,8 @@ class SlotMachineReels extends StatefulWidget {
 
 class _SlotMachineReelsState extends State<SlotMachineReels> {
 
-  final List<String> _simbolos = ['🍒', '🔔', '⭐', '💎', '7️⃣', '💀'];
+  final List<String> _simbolos = JuegoLogica.simbolos;
 
-  // Controladores de Scroll 
   late List<ScrollController> _controllers;
   late List<Timer?> _timers;
 
@@ -37,7 +41,6 @@ class _SlotMachineReelsState extends State<SlotMachineReels> {
   void didUpdateWidget(covariant SlotMachineReels oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    //  iniciamos la animación
     if (widget.girando && !oldWidget.girando) {
       _iniciarGiro();
     }
@@ -45,15 +48,10 @@ class _SlotMachineReelsState extends State<SlotMachineReels> {
 
   void _iniciarGiro() {
     final random = Random();
-    
 
-    List<String> resultadosFinales = [
-      _simbolos[random.nextInt(_simbolos.length)],
-      _simbolos[random.nextInt(_simbolos.length)],
-      _simbolos[random.nextInt(_simbolos.length)],
-    ];
+    final List<String> resultadosFinales = widget.resultadosFinales ??
+        List.generate(3, (_) => _simbolos[random.nextInt(_simbolos.length)]);
 
-    // Tiempos 
     final tiemposParada = [2000, 3000, 4000];
 
     for (int i = 0; i < 3; i++) {
@@ -63,7 +61,7 @@ class _SlotMachineReelsState extends State<SlotMachineReels> {
     Future.delayed(const Duration(milliseconds: 4500), () {
       if (mounted) {
         setState(() {
-          _simbolosVisibles = resultadosFinales;
+          _simbolosVisibles = List.of(resultadosFinales);
         });
         if (widget.onAnimationComplete != null) {
           widget.onAnimationComplete!(resultadosFinales);
@@ -73,7 +71,7 @@ class _SlotMachineReelsState extends State<SlotMachineReels> {
   }
 
   void _animarRodillo(int index, int duracionMs, String resultadoFinal) {
-    const int velocidadLoop = 50; // Velocidad del desplazamiento 
+    const int velocidadLoop = 50; // Velocidad del desplazamiento
     int tiempoTranscurrido = 0;
 
     _timers[index]?.cancel();
@@ -82,9 +80,11 @@ class _SlotMachineReelsState extends State<SlotMachineReels> {
 
       if (tiempoTranscurrido >= duracionMs) {
         timer.cancel();
+        setState(() {
+          _simbolosVisibles[index] = resultadoFinal;
+        });
       } else {
         setState(() {
-
           _simbolosVisibles[index] = _simbolos[Random().nextInt(_simbolos.length)];
         });
       }
