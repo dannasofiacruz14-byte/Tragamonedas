@@ -1,7 +1,9 @@
+// lib/screens/game_screen.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/result_dialog.dart';
+import '../widgets/rodillos_widget.dart'; 
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -18,23 +20,21 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       _girando = true;
     });
-
-    // PROVISIONAL: simula 3 segundos de giro y un resultado aleatorio.
-    // Integrante 2: aquí se conecta la animación de los rodillos.
-    // Integrante 3: aquí se llama a la lógica que decide premio o castigo.
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      setState(() {
-        _girando = false;
-      });
-      final bool esPremio = Random().nextBool();
-      _alTerminarGiro(esPremio, esPremio ? 'Ganas un dulce' : 'Haz 10 sentadillas');
-    });
   }
 
-  // ÚNICO punto de conexión: cuando se detiene el último rodillo
-  // y ya se sabe el resultado, se llama a esta función.
-  void _alTerminarGiro(bool esPremio, String mensaje) {
+  // Se ejecuta automáticamente al finalizar la animación de los 3 rodillos
+  void _alTerminarGiro(List<String> resultados) {
+    if (!mounted) return;
+
+    setState(() {
+      _girando = false;
+    });
+
+    // PROVISIONAL: Evaluación básica hasta que el Integrante 3 conecte sus listas
+    // Verifica si los 3 símbolos son idénticos
+    final bool esPremio = resultados[0] == resultados[1] && resultados[1] == resultados[2];
+    final String mensaje = esPremio ? '¡Felicidades! Ganas un premio' : 'Haz 10 sentadillas';
+
     mostrarResultado(context, esPremio: esPremio, mensaje: mensaje);
   }
 
@@ -73,13 +73,12 @@ class _GameScreenState extends State<GameScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white24, width: 2),
             ),
-            // PROVISIONAL: Integrante 2 reemplaza esto por su widget de rodillos
-            child: Row(
-              children: [
-                _Rodillo(girando: _girando),
-                _Rodillo(girando: _girando),
-                _Rodillo(girando: _girando),
-              ],
+
+
+            //  Componente de los rodillos con animación
+            child: SlotMachineReels(
+              girando: _girando,
+              onAnimationComplete: _alTerminarGiro,
             ),
           ),
           const SizedBox(height: 16),
@@ -154,37 +153,6 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Rodillo PROVISIONAL (lo reemplaza el widget del Integrante 2)
-class _Rodillo extends StatelessWidget {
-  final bool girando;
-  const _Rodillo({required this.girando});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        height: 90,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black54, width: 2),
-        ),
-        child: Center(
-          child: Text(
-            girando ? '?' : '7',
-            style: const TextStyle(
-              fontSize: 52,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
           ),
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-// Función que usan los demás para mostrar el pop-up
+
 void mostrarResultado(
   BuildContext context, {
   required bool esPremio,
